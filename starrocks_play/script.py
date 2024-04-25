@@ -50,7 +50,7 @@ def connect_starrocks(config, attempts=3, delay=2):
 def get_a_query_from(directory, ids_file):
     if (os.path.isdir(directory) and os.path.isfile(ids_file)):
         i = open(ids_file, "r")
-        ids = i.readlines()
+        ids = i.read().splitlines()
         i.close()
 
         random_file = random.choice(os.listdir(directory))
@@ -63,15 +63,31 @@ def get_a_query_from(directory, ids_file):
     else:
         logger.error("'%s' and/or '%s' not valid", directory, ids_file)
 
+def execute(cursor, query, sample_id):
+
+    logger.info("Starting query execution: '%s' with '%s'", query, sample_id)
+    start_ns = time.process_time_ns()
+
+    result = cursor.execute(query, (sample_id,))
+    rows = cursor.fetchall()
+
+    logger.info("Query execution ended in %dms", ((time.process_time_ns() - start_ns) / 1000))
+
+    for rows in rows:
+        print(rows)
+
+
 def start():
-    (QUERY, SAMPLE_ID) = get_a_query_from(env_config.get("SQL_SCRIPTS_DIR"), env_config.get("IDS_FILE"))
 
     cnx = connect_starrocks(MYSQL_CONFIG)
 
-    if QUERY and cnx and cnx.is_connected():
+    if cnx and cnx.is_connected():
 
-        with cnx.cursor() as cursor:
-            logger.info("Starting query execution: '%s'", QUERY)
+        for i in range(0, int(env_config.get("NUMBER_OF_LOOPS", "10"))):
+            (QUERY, SAMPLE_ID) = get_a_query_from(env_config.get("SQL_SCRIPTS_DIR"), env_config.get("IDS_FILE"))
+
+            cursor = cnx.cursor()
+            logger.info("Starting query execution: '%s' with '%s'", QUERY, SAMPLE_ID)
             start_ns = time.process_time_ns()
 
             result = cursor.execute(QUERY, (SAMPLE_ID,))
@@ -82,6 +98,10 @@ def start():
             for rows in rows:
                 print(rows)
 
+        cursor.close()
         cnx.close()
     else:
         print("Could not connect")
+
+if __name__ == "__main__":
+    start()
