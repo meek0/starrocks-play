@@ -1,0 +1,1 @@
+select c.vep_impact, count(1) from normalized_snv o inner join consequences c on o.chromosome = c.chromosome and o.start = c.start and o.reference = c.reference and o.alternate = c.alternate where o.sample_id = %s group by c.vep_impact;
