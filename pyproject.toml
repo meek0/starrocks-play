@@ -10,6 +10,8 @@ python = "^3.11"
 python-dotenv = "^1.0.1"
 mysql-connector-python = "^8.3.0"
 
+[tool.poetry.scripts]
+play = "starrocks_play.script:start"
 
 [build-system]
 requires = ["poetry-core"]

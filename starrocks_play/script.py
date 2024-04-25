@@ -62,24 +62,25 @@ def get_a_query_from(directory, ids_file):
     else:
         logger.error("'%s' and/or '%s' not valid", directory, ids_file)
 
-(QUERY, SAMPLE_ID) = get_a_query_from(env_config.get("SQL_SCRIPTS_DIR"), env_config.get("IDS_FILE"))
+def start():
+    (QUERY, SAMPLE_ID) = get_a_query_from(env_config.get("SQL_SCRIPTS_DIR"), env_config.get("IDS_FILE"))
 
-cnx = connect_starrocks(MYSQL_CONFIG)
+    cnx = connect_starrocks(MYSQL_CONFIG)
 
-if QUERY and cnx and cnx.is_connected():
+    if QUERY and cnx and cnx.is_connected():
 
-    with cnx.cursor() as cursor:
-        logger.info("Starting query execution: '%s'", QUERY)
-        start_ns = time.process_time_ns()
+        with cnx.cursor() as cursor:
+            logger.info("Starting query execution: '%s'", QUERY)
+            start_ns = time.process_time_ns()
 
-        result = cursor.execute(QUERY, (SAMPLE_ID,))
-        rows = cursor.fetchall()
+            result = cursor.execute(QUERY, (SAMPLE_ID,))
+            rows = cursor.fetchall()
 
-        logger.info("Query execution ended in %dns", (time.process_time_ns() - start_ns))
+            logger.info("Query execution ended in %dns", (time.process_time_ns() - start_ns))
 
-        for rows in rows:
-            print(rows)
+            for rows in rows:
+                print(rows)
 
-    cnx.close()
-else:
-    print("Could not connect")
+        cnx.close()
+    else:
+        print("Could not connect")
