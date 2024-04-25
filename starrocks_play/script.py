@@ -76,7 +76,7 @@ def start():
             result = cursor.execute(QUERY, (SAMPLE_ID,))
             rows = cursor.fetchall()
 
-            logger.info("Query execution ended in %dns", (time.process_time_ns() - start_ns))
+            logger.info("Query execution ended in %dms", ((time.process_time_ns() - start_ns) / 1000))
 
             for rows in rows:
                 print(rows)
