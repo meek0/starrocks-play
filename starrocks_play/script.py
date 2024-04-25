@@ -51,6 +51,7 @@ def get_a_query_from(directory, ids_file):
     if (os.path.isdir(directory) and os.path.isfile(ids_file)):
         i = open(ids_file, "r")
         ids = i.readlines()
+        i.close()
 
         random_file = random.choice(os.listdir(directory))
 
