@@ -1,0 +1,1 @@
+select count(1) from normalized_snv o left join gnomad_genomes_v3 g on o.chromosome = g.chromosome and o.start = g.start and o.reference = g.reference and o.alternate = g.alternate where sample_id = %s and g.af < 0.05 and g.af > 0.0;
