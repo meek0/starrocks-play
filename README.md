@@ -1,4 +1,4 @@
-# StarRocks-Play ofr fairelab-2024
+# StarRocks-Play for fairelab-2024
 
 ## Instructions
 
