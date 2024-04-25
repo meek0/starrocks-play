@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "starrocks-play"
+version = "0.1.0"
+description = ""
+authors = ["meek0 <cedricgfont@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+python-dotenv = "^1.0.1"
+mysql-connector-python = "^8.3.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
