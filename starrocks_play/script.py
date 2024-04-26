@@ -4,6 +4,8 @@ from mysql.connector import connection, Error
 import os
 import random
 import time
+import csv
+
 
 # Set up logger
 logger = logging.getLogger(__name__)
@@ -59,37 +61,45 @@ def get_a_query_from(directory, ids_file):
         query = f.read()
         f.close()
 
-        return (query, random.choice(ids))
+        return (query, random.choice(ids), random_file)
     else:
         logger.error("'%s' and/or '%s' not valid", directory, ids_file)
 
 
 def start():
 
-    cnx = connect_starrocks(MYSQL_CONFIG)
+    with open('results.csv', 'w', newline='') as csvfile:
+        fieldnames = ['query', 'sample_id', 'time_ms']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
-    if cnx and cnx.is_connected():
+        writer.writeheader()
 
-        for i in range(0, int(env_config.get("NUMBER_OF_LOOPS", "10"))):
-            (QUERY, SAMPLE_ID) = get_a_query_from(env_config.get("SQL_SCRIPTS_DIR"), env_config.get("IDS_FILE"))
+        cnx = connect_starrocks(MYSQL_CONFIG)
 
-            cursor = cnx.cursor()
-            logger.info("Starting query execution: '%s' with '%s'", QUERY, SAMPLE_ID)
-            start_ns = time.process_time_ns()
+        if cnx and cnx.is_connected():
 
-            result = cursor.execute(QUERY, (SAMPLE_ID,))
-            rows = cursor.fetchall()
+            for i in range(0, int(env_config.get("NUMBER_OF_LOOPS", "10"))):
+                (QUERY, SAMPLE_ID, QUERY_FILE) = get_a_query_from(env_config.get("SQL_SCRIPTS_DIR"), env_config.get("IDS_FILE"))
 
-            logger.info("Query execution ended in %dms", ((time.process_time_ns() - start_ns) / 1000))
+                cursor = cnx.cursor()
+                logger.info("Starting query execution: '%s' with '%s'", QUERY_FILE, SAMPLE_ID)
+                start_ns = time.process_time_ns()
 
-            # for rows in rows:
-            #     print(rows)
+                result = cursor.execute(QUERY, (SAMPLE_ID,))
+                rows = cursor.fetchall()
 
-        logger.info("-----")
-        cursor.close()
-        cnx.close()
-    else:
-        print("Could not connect")
+                end_ns = time.process_time_ns()
+                logger.info("Query execution ended in %dms", ((end_ns - start_ns) / 1000))
+                writer.writerow({'query': QUERY_FILE, 'sample_id': SAMPLE_ID, 'time_ms': ((end_ns - start_ns) / 1000)})
+
+                # for rows in rows:
+                #     print(rows)
+
+            logger.info("-----")
+            cursor.close()
+            cnx.close()
+        else:
+            print("Could not connect")
 
 if __name__ == "__main__":
     start()
