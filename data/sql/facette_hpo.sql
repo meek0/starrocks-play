@@ -1,0 +1,1 @@
+select h.hpo_term_id, h.hpo_term_name, count(1) as c from (SELECT unnest FROM occurrences, unnest(genes_symbol) AS unnest where sample_id = %s) o inner join hpo_gene_set h on o.unnest = h.symbol group by hpo_term_id, hpo_term_name order by c desc limit 10;

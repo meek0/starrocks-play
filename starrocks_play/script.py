@@ -63,19 +63,6 @@ def get_a_query_from(directory, ids_file):
     else:
         logger.error("'%s' and/or '%s' not valid", directory, ids_file)
 
-def execute(cursor, query, sample_id):
-
-    logger.info("Starting query execution: '%s' with '%s'", query, sample_id)
-    start_ns = time.process_time_ns()
-
-    result = cursor.execute(query, (sample_id,))
-    rows = cursor.fetchall()
-
-    logger.info("Query execution ended in %dms", ((time.process_time_ns() - start_ns) / 1000))
-
-    for rows in rows:
-        print(rows)
-
 
 def start():
 
@@ -95,9 +82,10 @@ def start():
 
             logger.info("Query execution ended in %dms", ((time.process_time_ns() - start_ns) / 1000))
 
-            for rows in rows:
-                print(rows)
+            # for rows in rows:
+            #     print(rows)
 
+        logger.info("-----")
         cursor.close()
         cnx.close()
     else:
