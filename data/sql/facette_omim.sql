@@ -1,0 +1,1 @@
+select g.phenotype_name, count(1) from occurrences o left join genes g on g.symbol = o.symbol where o.sample_id = %s and g.phenotype_name is not null group by g.phenotype_name order by 2 desc limit 10;
